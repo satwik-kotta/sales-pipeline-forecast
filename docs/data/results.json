@@ -1,0 +1,462 @@
+{
+  "integrity": {
+    "leads": 8000,
+    "won_deals": 842,
+    "duplicate_leads": 0,
+    "deals_without_lead": 0,
+    "duplicate_won_sellers": 0,
+    "wins_before_contact": 0,
+    "sales_before_won_date": 0,
+    "deals_in_revenue_window": 667,
+    "wins_one_or_two_days_early": 1
+  },
+  "funnel": {
+    "leads": 8000,
+    "wins": 842,
+    "win_rate": 0.10525,
+    "win_rate_after_sales_start": 0.12778315585672798,
+    "median_days_to_win": 14.0,
+    "share_won_within_90d": 0.8218527315914489,
+    "by_origin": [
+      {
+        "origin": "organic_search",
+        "leads": 2296,
+        "wins": 271,
+        "win_rate": 0.11803135888501742
+      },
+      {
+        "origin": "paid_search",
+        "leads": 1586,
+        "wins": 195,
+        "win_rate": 0.12295081967213115
+      },
+      {
+        "origin": "social",
+        "leads": 1350,
+        "wins": 75,
+        "win_rate": 0.05555555555555555
+      },
+      {
+        "origin": "unknown",
+        "leads": 1099,
+        "wins": 179,
+        "win_rate": 0.16287534121929026
+      },
+      {
+        "origin": "direct_traffic",
+        "leads": 499,
+        "wins": 56,
+        "win_rate": 0.11222444889779559
+      },
+      {
+        "origin": "email",
+        "leads": 493,
+        "wins": 15,
+        "win_rate": 0.030425963488843813
+      },
+      {
+        "origin": "referral",
+        "leads": 284,
+        "wins": 24,
+        "win_rate": 0.08450704225352113
+      },
+      {
+        "origin": "other",
+        "leads": 150,
+        "wins": 4,
+        "win_rate": 0.02666666666666667
+      },
+      {
+        "origin": "display",
+        "leads": 118,
+        "wins": 6,
+        "win_rate": 0.05084745762711865
+      },
+      {
+        "origin": "other_publicities",
+        "leads": 65,
+        "wins": 3,
+        "win_rate": 0.046153846153846156
+      },
+      {
+        "origin": "missing",
+        "leads": 60,
+        "wins": 14,
+        "win_rate": 0.23333333333333334
+      }
+    ],
+    "by_month": [
+      {
+        "month": "2017-06",
+        "leads": 4,
+        "wins": 0
+      },
+      {
+        "month": "2017-07",
+        "leads": 239,
+        "wins": 0
+      },
+      {
+        "month": "2017-08",
+        "leads": 386,
+        "wins": 0
+      },
+      {
+        "month": "2017-09",
+        "leads": 312,
+        "wins": 0
+      },
+      {
+        "month": "2017-10",
+        "leads": 416,
+        "wins": 0
+      },
+      {
+        "month": "2017-11",
+        "leads": 445,
+        "wins": 0
+      },
+      {
+        "month": "2017-12",
+        "leads": 200,
+        "wins": 3
+      },
+      {
+        "month": "2018-01",
+        "leads": 1141,
+        "wins": 73
+      },
+      {
+        "month": "2018-02",
+        "leads": 1028,
+        "wins": 113
+      },
+      {
+        "month": "2018-03",
+        "leads": 1174,
+        "wins": 147
+      },
+      {
+        "month": "2018-04",
+        "leads": 1352,
+        "wins": 207
+      },
+      {
+        "month": "2018-05",
+        "leads": 1303,
+        "wins": 122
+      },
+      {
+        "month": "2018-06",
+        "leads": 0,
+        "wins": 57
+      },
+      {
+        "month": "2018-07",
+        "leads": 0,
+        "wins": 37
+      },
+      {
+        "month": "2018-08",
+        "leads": 0,
+        "wins": 33
+      },
+      {
+        "month": "2018-09",
+        "leads": 0,
+        "wins": 23
+      },
+      {
+        "month": "2018-10",
+        "leads": 0,
+        "wins": 21
+      },
+      {
+        "month": "2018-11",
+        "leads": 0,
+        "wins": 6
+      }
+    ]
+  },
+  "scoring": {
+    "train_leads": 2169,
+    "test_leads": 3829,
+    "test_base_rate": 0.10995037868895273,
+    "models": {
+      "origin only": {
+        "auc": 0.6154427057196703,
+        "brier": 0.09604804537483357
+      },
+      "origin + landing page": {
+        "auc": 0.6727038796516231,
+        "brier": 0.09434483303745374
+      }
+    },
+    "deciles": [
+      {
+        "decile": 0,
+        "predicted": 0.0362123532,
+        "actual": 0.0626631854,
+        "wins": 24
+      },
+      {
+        "decile": 1,
+        "predicted": 0.0618357755,
+        "actual": 0.046997389,
+        "wins": 18
+      },
+      {
+        "decile": 2,
+        "predicted": 0.0710630345,
+        "actual": 0.0391644909,
+        "wins": 15
+      },
+      {
+        "decile": 3,
+        "predicted": 0.0771101101,
+        "actual": 0.0652741514,
+        "wins": 25
+      },
+      {
+        "decile": 4,
+        "predicted": 0.1019912074,
+        "actual": 0.0652741514,
+        "wins": 25
+      },
+      {
+        "decile": 5,
+        "predicted": 0.1119007171,
+        "actual": 0.0863874346,
+        "wins": 33
+      },
+      {
+        "decile": 6,
+        "predicted": 0.133670686,
+        "actual": 0.135770235,
+        "wins": 52
+      },
+      {
+        "decile": 7,
+        "predicted": 0.1665942017,
+        "actual": 0.1749347258,
+        "wins": 67
+      },
+      {
+        "decile": 8,
+        "predicted": 0.2237894207,
+        "actual": 0.2193211488,
+        "wins": 84
+      },
+      {
+        "decile": 9,
+        "predicted": 0.2387031508,
+        "actual": 0.2036553525,
+        "wins": 78
+      }
+    ],
+    "top_decile_win_rate": 0.20365535248041775,
+    "bottom_half_win_rate": 0.05587467362924282,
+    "top30_share_of_leads": 0.3000783494384957,
+    "top30_share_of_wins": 0.5439429928741093,
+    "test_landing_pages_seen_in_training": 0.6150430921911726
+  },
+  "forecast": {
+    "months": [
+      {
+        "month": "2018-03",
+        "actual": 65,
+        "open_leads": 2191,
+        "pipeline": 50.913579852003494,
+        "low": 41.8939521625458,
+        "high": 59.93320754146119,
+        "last_month": 48,
+        "avg_3m": 19.666666666666668
+      },
+      {
+        "month": "2018-04",
+        "actual": 78,
+        "open_leads": 3219,
+        "pipeline": 62.56904396198942,
+        "low": 52.60516740473811,
+        "high": 72.53292051924073,
+        "last_month": 65,
+        "avg_3m": 40.666666666666664
+      },
+      {
+        "month": "2018-05",
+        "actual": 52,
+        "open_leads": 4374,
+        "pipeline": 78.02275606633707,
+        "low": 66.88144794511801,
+        "high": 89.16406418755612,
+        "last_month": 78,
+        "avg_3m": 63.666666666666664
+      },
+      {
+        "month": "2018-06",
+        "actual": 57,
+        "open_leads": 5558,
+        "pipeline": 88.25537950241342,
+        "low": 76.35522734548047,
+        "high": 100.15553165934637,
+        "last_month": 52,
+        "avg_3m": 65.0
+      },
+      {
+        "month": "2018-07",
+        "actual": 37,
+        "open_leads": 5505,
+        "pipeline": 37.15319678870614,
+        "low": 29.37065379976633,
+        "high": 44.93573977764595,
+        "last_month": 57,
+        "avg_3m": 62.333333333333336
+      },
+      {
+        "month": "2018-08",
+        "actual": 33,
+        "open_leads": 5473,
+        "pipeline": 32.35165689994907,
+        "low": 25.079878358118386,
+        "high": 39.623435441779755,
+        "last_month": 37,
+        "avg_3m": 48.666666666666664
+      }
+    ],
+    "mape": {
+      "pipeline": 0.2478519580213775,
+      "last_month": 0.2796128480339007,
+      "avg_3m": 0.45003506450874875
+    },
+    "mae": {
+      "pipeline": 14.59950860725244,
+      "last_month": 14.166666666666666,
+      "avg_3m": 23.888888888888886
+    },
+    "interval_coverage": 0.3333333333333333,
+    "interval": 0.8
+  },
+  "revenue": {
+    "deals": 667,
+    "active_share": 0.4332833583208396,
+    "median_gmv": 0.0,
+    "mean_gmv": 510.18182908545725,
+    "total_gmv": 340291.27999999997,
+    "top10pct_share": 0.8067896127106167,
+    "by_lead_type": [
+      {
+        "lead_type": "unknown",
+        "deals": 4.0,
+        "active": 0.75,
+        "mean_gmv": 7161.200000000001,
+        "total_gmv": 28644.800000000003,
+        "share_of_deals": 0.005997001499250375,
+        "share_of_gmv": 0.08417729657956562
+      },
+      {
+        "lead_type": "online_big",
+        "deals": 100.0,
+        "active": 0.62,
+        "mean_gmv": 1605.4878000000003,
+        "total_gmv": 160548.78000000003,
+        "share_of_deals": 0.14992503748125938,
+        "share_of_gmv": 0.4717981019084593
+      },
+      {
+        "lead_type": "online_medium",
+        "deals": 270.0,
+        "active": 0.4666666666666667,
+        "mean_gmv": 342.7698148148147,
+        "total_gmv": 92547.84999999998,
+        "share_of_deals": 0.4047976011994003,
+        "share_of_gmv": 0.2719665634688023
+      },
+      {
+        "lead_type": "online_small",
+        "deals": 63.0,
+        "active": 0.38095238095238093,
+        "mean_gmv": 325.61952380952374,
+        "total_gmv": 20514.029999999995,
+        "share_of_deals": 0.0944527736131934,
+        "share_of_gmv": 0.0602837369209108
+      },
+      {
+        "lead_type": "online_beginner",
+        "deals": 43.0,
+        "active": 0.37209302325581395,
+        "mean_gmv": 275.63976744186044,
+        "total_gmv": 11852.51,
+        "share_of_deals": 0.06446776611694154,
+        "share_of_gmv": 0.034830484048841925
+      },
+      {
+        "lead_type": "online_top",
+        "deals": 12.0,
+        "active": 0.4166666666666667,
+        "mean_gmv": 224.0858333333333,
+        "total_gmv": 2689.0299999999997,
+        "share_of_deals": 0.017991004497751123,
+        "share_of_gmv": 0.007902141953211378
+      },
+      {
+        "lead_type": "industry",
+        "deals": 92.0,
+        "active": 0.34782608695652173,
+        "mean_gmv": 175.96369565217393,
+        "total_gmv": 16188.66,
+        "share_of_deals": 0.13793103448275862,
+        "share_of_gmv": 0.04757294985637011
+      },
+      {
+        "lead_type": "offline",
+        "deals": 83.0,
+        "active": 0.25301204819277107,
+        "mean_gmv": 88.01951807228916,
+        "total_gmv": 7305.62,
+        "share_of_deals": 0.12443778110944528,
+        "share_of_gmv": 0.021468725263838674
+      }
+    ],
+    "backtest": [
+      {
+        "month": "2018-03",
+        "deals": 147,
+        "actual": 69281.64999999998,
+        "flat": 119209.75888888891,
+        "by_lead_type": 105722.04641273929,
+        "flat_capped": 48550.67933333351,
+        "by_lead_type_capped": 45491.59165801668
+      },
+      {
+        "month": "2018-04",
+        "deals": 207,
+        "actual": 69498.51999999999,
+        "flat": 137107.52196428573,
+        "by_lead_type": 120973.98388293106,
+        "flat_capped": 72699.25633928567,
+        "by_lead_type_capped": 70449.01233587504
+      },
+      {
+        "month": "2018-05",
+        "deals": 122,
+        "actual": 48136.22999999999,
+        "flat": 65617.09561694291,
+        "by_lead_type": 68453.32959570386,
+        "flat_capped": 40379.81145930019,
+        "by_lead_type_capped": 41915.52594460179
+      }
+    ],
+    "backtest_mape": {
+      "flat": 0.6855400964340758,
+      "by_lead_type": 0.5629065516878593,
+      "flat_capped": 0.16880563732028095,
+      "by_lead_type_capped": 0.16209649207773602
+    },
+    "cap_quantile": 0.99,
+    "caps_tried": [
+      0.95,
+      0.98,
+      0.99
+    ]
+  }
+}

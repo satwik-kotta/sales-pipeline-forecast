@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline Forecast Memo</title>
+<style>
+:root{--bg:#fff;--ink:#1d1d1f;--muted:#5f5f66;--line:#e4e4e0;--accent:#2f5bd3}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--ink:#ececec;--muted:#a0a0a6;--line:#2e2e33;--accent:#7b9cff}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Georgia,"Times New Roman",serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 60px}
+h1{font:600 22px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0 0 4px}
+h2{font:600 15px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
+.meta{color:var(--muted);font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin-bottom:18px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+<h1>Memo. Forecasting new seller deals and the revenue they bring</h1>
+<div class="meta">Satwik Kotta · Olist public seller acquisition data, June 2017 to August 2018 · <a href="index.html">Dashboard</a> · <a href="https://github.com/satwik-kotta/sales-pipeline-forecast">Code</a></div>
+<div id="memo">Loading…</div>
+</main>
+<script>
+const pct=(v,d=0)=>(v*100).toFixed(d)+'%';
+fetch('data/results.json').then(r=>r.json()).then(d=>{
+  const F=d.funnel,S=d.scoring,C=d.forecast,R=d.revenue, big=R.by_lead_type.find(t=>t.lead_type==='online_big');
+  document.getElementById('memo').innerHTML=`
+<h2>Recommendation</h2>
+<p>Plan new seller deals from the open pipeline, rank leads by score so reps reach the best ones first, and plan revenue from a capped average per deal rather than from the deal count.</p>
+<h2>Deals</h2>
+<p>Of ${F.leads.toLocaleString()} qualified leads, ${F.wins} became sellers, ${pct(F.win_rate_after_sales_start,1)} of leads contacted after the sales team started. Half of all wins came within ${F.median_days_to_win} days of first contact. A forecast that ages every open lead and applies the win chance seen for leads of that age missed the monthly deal count by ${pct(C.mape.pipeline)} on average over March to August 2018, against ${pct(C.mape.last_month)} for repeating last month and ${pct(C.mape.avg_3m)} for a three month average. Its 80% range was too narrow, holding the actual in only ${Math.round(C.interval_coverage*6)} of 6 months, so the team should plan around a wider band.</p>
+<h2>Which leads to call first</h2>
+<p>A simple score built from the lead's traffic source and landing page, trained on January and February leads and tested on later ones, put ${pct(S.top30_share_of_wins)} of wins in the top 30% of leads. The top tenth converted at ${pct(S.top_decile_win_rate,1)}, almost twice the ${pct(S.test_base_rate,1)} average.</p>
+<h2>Revenue</h2>
+<p>Deals are a poor stand in for revenue. ${pct(1-R.active_share)} of new sellers sold nothing in their first 90 days, and the top 10% made ${pct(R.top10pct_share)} of the sales. Big online sellers were ${pct(big.share_of_deals)} of deals and ${pct(big.share_of_gmv)} of sales. A plain average per deal overshot each month's new seller sales by ${pct(R.backtest_mape.flat)} because a few very large sellers pulled it up. Capping each past deal at the 99th percentile brought the error to ${pct(R.backtest_mape.flat_capped)}, measured on only three months.</p>
+<h2>What I would do next</h2>
+<p>Add rep capacity to the deal forecast, since open leads more than doubled from March to June while monthly wins did not, and refresh the score every month as new landing pages appear.</p>`;
+});
+</script>
+</body>
+</html>

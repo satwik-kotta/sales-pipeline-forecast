@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales Pipeline Forecast</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e4e4e0;--accent:#2f5bd3;--accent2:#d9822b;--good:#2e8b57;--grey:#9a9aa0}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--card:#1d1d20;--ink:#ececec;--muted:#9b9ba1;--line:#2e2e33;--accent:#7b9cff;--accent2:#f0a055;--good:#5cc08a;--grey:#76767c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+main{max-width:1120px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:17px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 22px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.kpi,.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.kpi b{display:block;font-size:24px;letter-spacing:-.01em}
+.kpi span{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.card p.note{color:var(--muted);font-size:13px;margin:2px 0 10px}
+.chart{height:330px;width:100%}
+.answer{border-left:4px solid var(--accent);background:var(--card);padding:14px 18px;border-radius:8px;margin:0 0 16px}
+.answer ul{margin:6px 0 0;padding-left:18px}
+.method{font-size:13.5px;color:var(--muted)}
+.method li{margin-bottom:4px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>How many sellers will we sign next month, and what will they sell?</h1>
+  <p class="sub">Pipeline and revenue forecasting on Olist's real seller acquisition funnel: 8,000 marketing qualified leads from June 2017 to May 2018, the deals the sales team closed, and every order those sellers went on to make. <a href="https://github.com/satwik-kotta/sales-pipeline-forecast">Code and method</a> · <a href="memo.html">One page memo</a></p>
+
+  <div class="answer" id="answer"></div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Leads in, deals out</h2>
+      <p class="note">New qualified leads by contact month and deals won by month. The sales team closed its first deal in December 2017.</p>
+      <div class="chart" id="funnel"></div>
+    </div>
+    <div class="card">
+      <h2>Lead score, tested on later leads</h2>
+      <p class="note">Leads from March to May 2018 split into ten equal groups by a score trained only on January and February leads. Share won within 90 days.</p>
+      <div class="chart" id="deciles"></div>
+    </div>
+    <div class="card">
+      <h2>Monthly deals from the existing pipeline</h2>
+      <p class="note">Forecast made at the start of each month from leads already in the pipeline, against two run rate rules.</p>
+      <div class="chart" id="fc"></div>
+    </div>
+    <div class="card">
+      <h2>Which deals bring the revenue</h2>
+      <p class="note">Share of deals against share of the sellers' first 90 days of sales, by the lead type the sales rep recorded.</p>
+      <div class="chart" id="types"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Forecasting the next cohort's sales</h2>
+    <p class="note">Each month's new sellers, forecast from sellers signed in earlier months. A plain average per deal is pulled up by a few very large sellers. Capping each past deal at the 99th percentile fixes most of it.</p>
+    <div class="chart" id="rev" style="height:300px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>How the numbers were built</h2>
+    <ul class="method" id="method"></ul>
+  </div>
+</main>
+<script>
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $=id=>document.getElementById(id);
+const pct=(v,d=0)=>(v*100).toFixed(d)+'%';
+const brl=v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1e3?'R$'+Math.round(v/1e3)+'K':'R$'+Math.round(v);
+const base=()=>({textStyle:{color:css('--ink'),fontFamily:'inherit'},grid:{left:52,right:16,top:36,bottom:40}});
+const axis=()=>({axisLine:{lineStyle:{color:css('--line')}},axisLabel:{color:css('--muted')},splitLine:{lineStyle:{color:css('--line')}}});
+const legend=()=>({top:0,textStyle:{color:css('--muted')}});
+
+fetch('data/results.json').then(r=>r.json()).then(d=>{
+  const F=d.funnel,S=d.scoring,C=d.forecast,R=d.revenue;
+  const big=R.by_lead_type.find(t=>t.lead_type==='online_big');
+  const m=S.models['origin + landing page'];
+
+  $('answer').innerHTML=`<b>What the sales and finance teams should take from this</b>
+  <ul>
+   <li>Work leads by score. On later leads the top 30% by score held ${pct(S.top30_share_of_wins)} of the wins, and the top tenth converted at ${pct(S.top_decile_win_rate,1)} against ${pct(S.test_base_rate,1)} on average.</li>
+   <li>Forecast deals from the pipeline, not last month. Error was ${pct(C.mape.pipeline)} a month against ${pct(C.mape.last_month)} for last month's count and ${pct(C.mape.avg_3m)} for a three month average.</li>
+   <li>Do not plan revenue from deal counts. ${pct(1-R.active_share)} of new sellers sold nothing in their first 90 days, and the top 10% of sellers made ${pct(R.top10pct_share)} of the sales. Big online sellers were ${pct(big.share_of_deals)} of deals but ${pct(big.share_of_gmv)} of sales.</li>
+   <li>A capped average per deal forecast each month's new seller sales within ${pct(R.backtest_mape.flat_capped)}, against ${pct(R.backtest_mape.flat)} for a plain average.</li>
+  </ul>`;
+
+  $('kpis').innerHTML=[
+    [F.leads.toLocaleString(),'marketing qualified leads'],
+    [pct(F.win_rate_after_sales_start,1),'won, for leads contacted after sales started'],
+    [F.median_days_to_win+' days','median time from first contact to a win'],
+    [pct(R.active_share),'of new sellers made a sale in their first 90 days']
+  ].map(([a,b])=>`<div class="kpi"><b>${a}</b><span>${b}</span></div>`).join('');
+
+  const fu=echarts.init($('funnel'));
+  fu.setOption({...base(),grid:{left:52,right:44,top:36,bottom:40},legend:legend(),tooltip:{trigger:'axis'},
+    xAxis:{type:'category',data:F.by_month.map(r=>r.month),...axis()},
+    yAxis:[{type:'value',name:'leads',...axis()},{type:'value',name:'deals',...axis(),splitLine:{show:false}}],
+    series:[{name:'Leads',type:'bar',data:F.by_month.map(r=>r.leads),itemStyle:{color:css('--grey'),borderRadius:[3,3,0,0]}},
+            {name:'Deals won',type:'line',yAxisIndex:1,data:F.by_month.map(r=>r.wins),itemStyle:{color:css('--accent')},lineStyle:{width:2.5},symbolSize:6}]});
+
+  const de=echarts.init($('deciles'));
+  de.setOption({...base(),legend:legend(),tooltip:{trigger:'axis',valueFormatter:v=>pct(v,1)},
+    xAxis:{type:'category',name:'score group',nameLocation:'middle',nameGap:26,data:S.deciles.map(r=>r.decile+1),...axis()},
+    yAxis:{type:'value',...axis(),axisLabel:{color:css('--muted'),formatter:v=>pct(v)}},
+    series:[{name:'Actual win rate',type:'bar',data:S.deciles.map(r=>r.actual),itemStyle:{color:css('--accent'),borderRadius:[3,3,0,0]}},
+            {name:'Predicted',type:'line',data:S.deciles.map(r=>r.predicted),itemStyle:{color:css('--accent2')},lineStyle:{width:2},symbolSize:6},
+            {name:'Average',type:'line',data:S.deciles.map(()=>S.test_base_rate),symbol:'none',lineStyle:{type:'dashed',color:css('--muted')},itemStyle:{color:css('--muted')}}]});
+
+  const fc=echarts.init($('fc'));
+  fc.setOption({...base(),legend:legend(),tooltip:{trigger:'axis',valueFormatter:v=>Math.round(v)},
+    xAxis:{type:'category',data:C.months.map(r=>r.month),...axis()},
+    yAxis:{type:'value',...axis()},
+    series:[{name:'Actual',type:'bar',data:C.months.map(r=>r.actual),itemStyle:{color:css('--grey'),borderRadius:[3,3,0,0]}},
+            {name:'Pipeline forecast',type:'line',data:C.months.map(r=>r.pipeline),itemStyle:{color:css('--accent')},lineStyle:{width:2.5},symbolSize:7},
+            {name:'Last month',type:'line',data:C.months.map(r=>r.last_month),itemStyle:{color:css('--accent2')},lineStyle:{type:'dashed'}},
+            {name:'3 month average',type:'line',data:C.months.map(r=>r.avg_3m),itemStyle:{color:css('--good')},lineStyle:{type:'dotted'}}]});
+
+  const ty=echarts.init($('types')), T=R.by_lead_type.filter(t=>t.lead_type!=='unknown');
+  ty.setOption({...base(),grid:{left:110,right:16,top:36,bottom:30},legend:legend(),tooltip:{trigger:'axis',valueFormatter:v=>pct(v,1)},
+    yAxis:{type:'category',data:T.map(t=>t.lead_type.replace('_',' ')),inverse:true,...axis()},
+    xAxis:{type:'value',...axis(),axisLabel:{color:css('--muted'),formatter:v=>pct(v)}},
+    series:[{name:'Share of deals',type:'bar',data:T.map(t=>t.share_of_deals),itemStyle:{color:css('--grey')}},
+            {name:'Share of 90 day sales',type:'bar',data:T.map(t=>t.share_of_gmv),itemStyle:{color:css('--accent')}}]});
+
+  const rv=echarts.init($('rev'));
+  rv.setOption({...base(),legend:legend(),tooltip:{trigger:'axis',valueFormatter:brl},
+    xAxis:{type:'category',data:R.backtest.map(r=>`${r.month} (${r.deals} deals)`),...axis()},
+    yAxis:{type:'value',...axis(),axisLabel:{color:css('--muted'),formatter:brl}},
+    series:[{name:'Actual',type:'bar',data:R.backtest.map(r=>r.actual),itemStyle:{color:css('--grey'),borderRadius:[3,3,0,0]}},
+            {name:'Plain average per deal',type:'bar',data:R.backtest.map(r=>r.flat),itemStyle:{color:css('--accent2'),borderRadius:[3,3,0,0]}},
+            {name:'Capped average per deal',type:'bar',data:R.backtest.map(r=>r.flat_capped),itemStyle:{color:css('--accent'),borderRadius:[3,3,0,0]}}]});
+
+  $('method').innerHTML=[
+    `Data: Olist's public marketing funnel (${F.leads.toLocaleString()} leads, ${F.wins} closed deals) joined by seller to Olist's public order data. Olist is a Brazilian marketplace, so sales are in Brazilian reais. Integrity checks fail the build on duplicate leads, deals without a lead, wins before first contact and sales dated before a seller was signed.`,
+    `Lead score: logistic regression on the lead's traffic source and landing page, each turned into a win rate shrunk toward the average so rare pages are not over read. Trained on ${S.train_leads.toLocaleString()} January and February 2018 leads, tested on ${S.test_leads.toLocaleString()} March to May leads (AUC ${m.auc.toFixed(2)}, ${pct(S.test_landing_pages_seen_in_training)} of test pages seen in training). A win means a deal within 90 days.`,
+    `Deal forecast: at the start of each month, every open lead gets the chance a lead of its age (months since first contact) was won in a month, estimated only from wins already observed. Leads from before the sales team started are forecast with their own three month average. The 80% range from this model held the actual only ${Math.round(C.interval_coverage*6)} of 6 months, so month to month swings are wider than the model assumes.`,
+    `Revenue: each signed seller's item sales in the 90 days after the win, for the ${R.deals} sellers whose window ends before the order data does (August 2018). The cap was chosen from three tried (95th, 98th, 99th percentile) on only three test months, so treat ${pct(R.backtest_mape.flat_capped)} as optimistic.`,
+    `Limits: one company, one year, and a sample of its leads. Lead type is recorded by the sales rep when the deal closes, so it helps plan revenue for signed deals, not to score new leads.`
+  ].map(x=>`<li>${x}</li>`).join('');
+
+  addEventListener('resize',()=>[fu,de,fc,ty,rv].forEach(c=>c.resize()));
+});
+</script>
+</body>
+</html>
